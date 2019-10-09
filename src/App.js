@@ -6,10 +6,6 @@ class App extends React.Component {
     constructor(props) {
         super(props);
 
-        this.db = {};
-    }
-
-    componentDidMount() {
         const firebaseConfig = {
             apiKey: "AIzaSyCOCNeiSUMlHQGBGyAa2kzbLhAUQlDcnyE",
             authDomain: "test-fcm-1fced.firebaseapp.com",
@@ -24,6 +20,13 @@ class App extends React.Component {
 
         this.db = firebase.database();
 
+        this.state = {
+            lastVisitToFeatures: 1570658445356, //-LqmXTVjLi7Um_uALMq9 Wed Oct 09 2019 17:00:45 GMT-0500 (hora de verano central)
+        }
+    }
+
+    setFeature = () => {
+        console.log('setFeature');
         const newFeature = {
             date: new Date().getTime(),
             title: 'Dashboard refactor',
@@ -34,19 +37,19 @@ class App extends React.Component {
 
         const newFeatureKey = this.db.ref().child('feature').push().key;
 
-        // let updates = {};
-        // updates[`/feature/${newFeatureKey}`] = newFeature;
         this.db.ref(`/feature/${newFeatureKey}`).set(newFeature).then(function () {
             console.log("Success!");
         }).catch(function (error) {
             console.log("Error: " + error);
         });
+    }
 
-        // this.db.ref().update(updates).then(function () {
-        //     console.log("Success!");
-        // }).catch(function (error) {
-        //     console.log("Error: " + error);
-        // });
+    getFeatures = () => {
+        // this.db.ref('feature/').orderByChild("date").once('value').then((snapshot) => {
+        this.db.ref('feature/').orderByChild("date").startAt(this.state.lastVisitToFeatures).once('value').then((snapshot) => {
+            console.log('getFeatures')
+            console.log(snapshot.val())
+        });
     }
 
     // // Como se que usuarios ya vieron la notificaciones
@@ -71,14 +74,21 @@ class App extends React.Component {
     //                     //click a
     //                 // Si no
     //                     //Crearla (lastVisitToFeatures) y mostrarle todos los features?
+    //                     //mas bien ninguno
 
+    //Pulido
+    //si(existe lastVisitToFeatures)
+        //mostrar los features a partir de lastVisitFeatures (startAt)
+    //si no 
+        //crear una fecha lastVisitToFeatures y no mostrar nada  
 
 
     render() {
         return (
             <div className="App">
                 <header className="App-header">
-                    <p>New push notifications</p>
+                    <button onClick={this.setFeature}>Create feature</button>
+                    <button onClick={this.getFeatures}>Get features</button>
                 </header>
             </div>
         );
